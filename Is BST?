@@ -1,0 +1,120 @@
+// Binary Tree : is bst ?
+
+#include <iostream>
+using namespace std;
+
+typedef struct Node
+{
+	int data;
+	Node* left;
+	Node* right;
+} BSTNode;
+
+class BSTree
+{
+	BSTNode* _root;
+	BSTNode* NewNode(int val);
+	BSTNode* insertHelper(BSTNode* pNode, int val);
+	bool isValidBSTHelper(BSTNode* pNode, int min, int max);
+public:
+	BSTree(): _root(NULL) {}
+    ~BSTree() {}
+	void insert(int val);
+	void inorder(BSTNode* pNode);
+	bool isValidBST();
+	BSTNode* getRoot() { return _root; }
+
+};
+
+BSTNode* BSTree::NewNode(int val)
+{
+	BSTNode* tmp = new BSTNode;
+	tmp->data = val;
+	tmp->left = tmp->right = NULL;
+
+	return tmp;
+}
+
+BSTNode* BSTree::insertHelper(BSTNode* pNode, int val)
+{
+	if (pNode == NULL)
+	{
+		pNode = NewNode(val);
+	}
+	else if (pNode->data < val)
+	{
+		 pNode->right = insertHelper(pNode->right, val);
+	}
+	else
+	{
+		pNode->left = insertHelper(pNode->left, val);
+	}
+	return pNode;
+}
+
+void BSTree::insert(int val)
+{
+	BSTNode* pCrawl = NULL;// , *parent = NULL;
+	if (_root == NULL)
+	{
+		_root = NewNode(val);
+	}
+	else
+	{
+		pCrawl = _root;
+		insertHelper(pCrawl, val);
+	}
+}
+
+bool BSTree::isValidBSTHelper(BSTNode* pNode, int min, int max)
+{
+	if (pNode == NULL)
+		return true;
+
+	if (pNode->data < min && pNode->data > max)
+		return false;
+
+	return (isValidBSTHelper(pNode->left, min, pNode->data - 1) && isValidBSTHelper(pNode->right, pNode->data + 1, max));
+	
+}
+
+bool BSTree::isValidBST()
+{
+	if (_root == NULL)
+		return false;
+	else
+		return isValidBSTHelper(_root, INT_MIN, INT_MAX);
+}
+
+void BSTree::inorder(BSTNode* pNode)
+{
+	if (pNode == NULL)
+		return;
+	inorder(pNode->left);
+	printf_s("%d ", pNode->data);
+	inorder(pNode->right);
+}
+
+int main()
+{
+	BSTree *tree = new BSTree();
+	
+	// insertion
+	tree->insert(50);
+	tree->insert(30);
+	tree->insert(20);
+	tree->insert(40);
+	tree->insert(70);
+	tree->insert(60);
+	tree->insert(80);
+
+	// Inorder traversal
+	printf_s("Inorder teraversal \n");
+	tree->inorder(tree->getRoot());
+	printf_s("\n");
+
+	// check is BST ?
+	tree->isValidBST();
+
+	return 0;
+}
