@@ -1,0 +1,102 @@
+// Binary Tree : Print lowest common ancestor
+
+#include <iostream>
+using namespace std;
+
+typedef struct Node
+{
+	int data;
+	Node* left;
+	Node* right;
+} BSTNode;
+
+class BSTree
+{
+	BSTNode* _root;
+	BSTNode* NewNode(int val);
+	BSTNode* insertHelper(BSTNode* pNode, int val);
+public:
+	BSTree(): _root(NULL) {}
+    ~BSTree() {}
+	void insert(int val);
+	BSTNode* LowestCommonAncestor(BSTNode* pNode, int first, int second);
+	BSTNode* getRoot() { return _root; }
+
+};
+
+BSTNode* BSTree::LowestCommonAncestor(BSTNode* pNode, int first, int second)
+{
+	if (pNode == NULL)
+		return NULL;
+
+	if (pNode->data > first && pNode->data > second)
+		return LowestCommonAncestor(pNode->left, first, second);
+		
+	if (pNode->data < first && pNode->data < second)
+		return LowestCommonAncestor(pNode->right, first, second);
+
+	return pNode;
+}
+
+BSTNode* BSTree::NewNode(int val)
+{
+	BSTNode* tmp = new BSTNode;
+	tmp->data = val;
+	tmp->left = tmp->right = NULL;
+
+	return tmp;
+}
+
+BSTNode* BSTree::insertHelper(BSTNode* pNode, int val)
+{
+	if (pNode == NULL)
+	{
+		pNode = NewNode(val);
+	}
+	else if (pNode->data < val)
+	{
+		 pNode->right = insertHelper(pNode->right, val);
+	}
+	else
+	{
+		pNode->left = insertHelper(pNode->left, val);
+	}
+	return pNode;
+}
+
+void BSTree::insert(int val)
+{
+	BSTNode* pCrawl = NULL;// , *parent = NULL;
+	if (_root == NULL)
+	{
+		_root = NewNode(val);
+	}
+	else
+	{
+		pCrawl = _root;
+		insertHelper(pCrawl, val);
+	}
+}
+
+int main()
+{
+	BSTree *tree = new BSTree();
+	
+	// insertion
+	tree->insert(50);
+	tree->insert(30);
+	tree->insert(20);
+	tree->insert(40);
+	tree->insert(70);
+	tree->insert(60);
+	tree->insert(80);
+
+	// Lowest common ancestor 
+	BSTNode* pNode = tree->LowestCommonAncestor(tree->getRoot(), 20, 40);
+	printf_s("Lowest Common Ancestor is : %d \n", pNode->data);
+
+	pNode = tree->LowestCommonAncestor(tree->getRoot(), 20, 50);
+	printf_s("Lowest Common Ancestor is : %d \n", pNode->data);
+
+	return 0;
+}
