@@ -1,0 +1,233 @@
+// Binary Tree : insertion and search
+
+#include <iostream>
+using namespace std;
+
+typedef struct Node
+{
+	int data;
+	Node* left;
+	Node* right;
+} BSTNode;
+
+class BSTree
+{
+	BSTNode* _root;
+	BSTNode* NewNode(int val);
+	BSTNode* insertHelper(BSTNode* pNode, int val);
+	BSTNode* deleteHelper(BSTNode* pNode, int val);
+public:
+	BSTree(): _root(NULL) {}
+    ~BSTree() {}
+	void insert(int val);
+	void inorder(BSTNode* pNode);
+	bool find(int val);
+	int findMin();
+	int findMax();
+	void deleteNode(int val);
+	BSTNode* getRoot() { return _root; }
+
+};
+
+BSTNode* BSTree::NewNode(int val)
+{
+	BSTNode* tmp = new BSTNode;
+	tmp->data = val;
+	tmp->left = tmp->right = NULL;
+
+	return tmp;
+}
+
+BSTNode* BSTree::insertHelper(BSTNode* pNode, int val)
+{
+	if (pNode == NULL)
+	{
+		pNode = NewNode(val);
+	}
+	else if (pNode->data < val)
+	{
+		 pNode->right = insertHelper(pNode->right, val);
+	}
+	else
+	{
+		pNode->left = insertHelper(pNode->left, val);
+	}
+	return pNode;
+}
+
+void BSTree::insert(int val)
+{
+	BSTNode* pCrawl = NULL;// , *parent = NULL;
+	if (_root == NULL)
+	{
+		_root = NewNode(val);
+	}
+	else
+	{
+		pCrawl = _root;
+		insertHelper(pCrawl, val);
+	}
+}
+
+void BSTree::inorder(BSTNode* pNode)
+{
+	if (pNode == NULL)
+		return;
+	inorder(pNode->left);
+	printf_s("%d ", pNode->data);
+	inorder(pNode->right);
+}
+
+bool BSTree::find(int val)
+{
+	BSTNode* pCrawl = _root;
+	while (pCrawl != NULL)
+	{
+		if (pCrawl->data == val)
+		{
+			return true;
+		}
+		else if (pCrawl->data < val)
+		{
+			pCrawl = pCrawl->right;
+		}
+		else
+		{
+			pCrawl = pCrawl->left;
+		}
+	}
+	return false;
+}
+
+int BSTree::findMin()
+{
+	BSTNode* pCrawl = _root;
+	int data;
+	while (pCrawl != NULL)
+	{
+		data = pCrawl->data;
+		pCrawl = pCrawl->left;
+	}
+
+	return data;
+}
+
+int BSTree::findMax()
+{
+	BSTNode* pCrawl = _root;
+	int data;
+	while (pCrawl != NULL)
+	{
+		data = pCrawl->data;
+		pCrawl = pCrawl->right;
+	}
+
+	return data;
+
+}
+
+BSTNode* BSTree::deleteHelper(BSTNode* pNode, int val)
+{
+	if (pNode == NULL)
+	{
+		return pNode;
+	}
+
+	if (pNode->data < val)
+	{
+		 pNode->right = deleteHelper(pNode->right, val);
+	}
+	else if (pNode->data > val)
+	{
+		pNode->left = deleteHelper(pNode->left, val);
+	}
+	else
+	{
+		// Leaf node deletion
+		if (pNode->left == NULL && pNode->right == NULL)
+		{
+			delete pNode;
+			return NULL;
+		} // node with only right child
+	    else if (pNode->left == NULL)
+		{
+			BSTNode * tmp = pNode->right;
+			delete pNode;
+			return tmp;
+		} // node with only left child
+		else if (pNode->right == NULL)
+		{
+			BSTNode * tmp = pNode->left;
+			delete pNode;
+			return tmp;
+		}
+
+		// node with two children: Get the inorder successor (smalles in the right subtree)
+		BSTNode* tmp = pNode->right;
+		while (tmp->left != NULL)
+			tmp = tmp->left;
+
+		pNode->data = tmp->data;
+		pNode->right = deleteHelper(pNode->right, tmp->data);
+	}
+
+	return pNode;
+}
+
+void BSTree::deleteNode(int val)
+{
+	if (_root == NULL)
+		return;
+	else
+	{
+		_root = deleteHelper(_root, val);
+	}
+}
+
+int main()
+{
+	BSTree *tree = new BSTree();
+	
+	// insertion
+	tree->insert(50);
+	tree->insert(30);
+	tree->insert(20);
+	tree->insert(40);
+	tree->insert(70);
+	tree->insert(60);
+	tree->insert(80);
+
+	// Inorder traversal
+	printf_s("Inorder teraversal \n");
+	tree->inorder(tree->getRoot());
+	printf_s("\n");
+
+	// search
+	printf_s("find val 80: %s \n", tree->find(70) ? "found" : "not found");
+	printf_s("find val 30: %s \n", tree->find(30) ? "found" : "not found");
+	printf_s("find val 90: %s \n", tree->find(90) ? "found" : "not found");
+
+	// find max
+	printf_s("find max value in tree %d \n", tree->findMax());
+
+	// find min
+	printf_s("find min value in tree %d \n", tree->findMin());
+
+	// deletion
+	printf("\nDelete 20\n");
+	tree->deleteNode(20);
+	printf("Inorder traversal of the modified tree \n");
+	tree->inorder(tree->getRoot());
+
+	printf("\nDelete 30\n");
+	tree->deleteNode(30);
+	printf("Inorder traversal of the modified tree \n");
+	tree->inorder(tree->getRoot());
+
+	printf("\nDelete 50\n");
+	tree->deleteNode(50);
+	printf("Inorder traversal of the modified tree \n");
+	tree->inorder(tree->getRoot());
+
+	return 0;
+}
